@@ -1,19 +1,35 @@
+from pathlib import Path
+
+
 class SceneFile(object):
-    def __init__(self, folder_path, descriptor, task, version, ext):
-        self.folder_path = folder_path
-        self.descriptor = descriptor
-        self.task = task
-        self.version = version
-        self.ext = ext
+    def __init__(self, path):
+        self.folder_path = Path()
+        self.descriptor = 'main'
+        self.task = None
+        self.ver = 1
+        self.ext = '.ma'
+        self._init_from_path(path)
 
     @property
     def filename(self):
         pattern = "{descriptor}_{task}_v{ver:03d}{ext}"
         return pattern.format(descriptor=self.descriptor,
                               task=self.task,
-                              ver=self.version,
+                              ver=self.ver,
                               ext=self.ext)
 
+    @property
+    def path(self):
+        return self.folder_path / self.filename
 
-scene_file = SceneFile("C:\\", "tank", "model", 1, ".ma")
+    def _init_from_path(self, path):
+        path = Path(path)
+        self.folder_path = path.parent
+        self.ext = path.suffix
+        self.descriptor, self.task, ver = path.stem.split("_")
+        self.ver = int(ver.split("v")[-1])
+
+
+scene_file = SceneFile("C:/tank_model_v001.ma")
+print(scene_file.path)
 print(scene_file.filename)
