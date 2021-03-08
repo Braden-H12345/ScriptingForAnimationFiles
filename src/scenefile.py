@@ -49,3 +49,25 @@ class SceneFile(object):
             log.warning("Missing directories in path. Creating directories...")
             self.folder_path.makedirs_p()
             return pmc.system.saveAs(self.path)
+
+    def next_avail_ver(self):
+        pattern = "{descriptor}_{task}_v*{ext}".format(
+            descriptor=self.descriptor,
+            task=self.task,
+            ext=self.ext)
+        matching_scene_files = []
+        for file_ in self.folder_path.files():
+            if file_.name.fnmatch(pattern):
+                matching_scene_files.append(file_)
+        if not matching_scene_files:
+            return 1;
+
+        matching_scene_files.sort(reverse=True)
+        latest_scene_file = matching_scene_files[0]
+        latest_scene_file = latest_scene_file.name.stripext()
+        latest_ver_num = latest_scene_file.split("_v")[-1]
+        return latest_ver_num + 1
+    
+    def increment_save(self):
+        self.ver = self.next_avail_ver()
+        self.save()
