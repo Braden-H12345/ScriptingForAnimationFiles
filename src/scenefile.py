@@ -65,9 +65,9 @@ class SceneFile(object):
         matching_scene_files.sort(reverse=True)
         latest_scene_file = matching_scene_files[0]
         latest_scene_file = latest_scene_file.name.stripext()
-        latest_ver_num = latest_scene_file.split("_v")[-1]
+        latest_ver_num = int(latest_scene_file.split("_v")[-1])
         return latest_ver_num + 1
-    
+
     def increment_save(self):
         self.ver = self.next_avail_ver()
         self.save()
