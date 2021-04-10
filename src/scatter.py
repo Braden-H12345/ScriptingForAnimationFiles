@@ -23,3 +23,21 @@ class ScatterToolUI(QtWidgets.QDialog):
         self.setMinimumWidth(500)
         self.setMaximumHeight(400)
         self.setMaximumWidth(1200)
+        self.setWindowFlags(self.windowFlags() ^
+                            QtCore.Qt.WindowContextHelpButtonHint)
+        self.create_ui()
+
+    def create_ui(self):
+        self.title_lbl = QtWidgets.QLabel("Scatter Tool")
+        self.title_lbl.setStyleSheet("font: bold 20px")
+        self.button_lay = self._create_button_ui()
+        self.main_lay = QtWidgets.QVBoxLayout()
+        self.main_lay.addWidget(self.title_lbl)
+        self.main_lay.addLayout(self.button_lay)
+        self.setLayout(self.main_lay)
+
+    def _create_button_ui(self):
+        self.scatter_btn = QtWidgets.QPushButton("Scatter")
+        layout = QtWidgets.QHBoxLayout()
+        layout.addWidget(self.scatter_btn)
+        return layout
