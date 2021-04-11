@@ -45,6 +45,55 @@ class ScatterToolUI(QtWidgets.QDialog):
         return layout
 
     def _create_selection_layouts(self):
+        layout = self.create_labels()
+        rot_x_sbx = self._set_sbx_properties()
+        rot_y_sbx = self._set_sbx_properties()
+        rot_z_sbx = self._set_sbx_properties()
+        size_x_sbx = self._set_dsbx_properties()
+        size_y_sbx = self._set_dsbx_properties()
+        size_z_sbx = self._set_dsbx_properties()
+        self.second_select = QtWidgets.QLineEdit("Type in an existing polygon name")
+        self.first_select = QtWidgets.QLineEdit("Type in an existing polygon name or type of polygon (ex. polySphere)")
+        self.first_select.setFixedWidth(450)
+        layout.addWidget(self.second_select, 5, 0)
+        layout.addWidget(self.first_select, 1, 0)
+
+        layout.addWidget(rot_x_sbx, 1, 1)
+        layout.addWidget(QtWidgets.QLabel("x"), 1, 2)
+        layout.addWidget(rot_y_sbx, 1, 3)
+        layout.addWidget(QtWidgets.QLabel("y"), 1, 4)
+        layout.addWidget(rot_z_sbx, 1, 5)
+        layout.addWidget(QtWidgets.QLabel("z"), 1, 6)
+
+        layout.addWidget(size_x_sbx, 5, 1)
+        layout.addWidget(QtWidgets.QLabel("x"), 5, 2)
+        layout.addWidget(size_y_sbx, 5, 3)
+        layout.addWidget(QtWidgets.QLabel("y"), 5, 4)
+        layout.addWidget(size_z_sbx, 5, 5)
+        layout.addWidget(QtWidgets.QLabel("z"), 5, 6)
+        return layout
+
+    def _set_sbx_properties(self):
+        spinbox = QtWidgets.QSpinBox()
+        spinbox.setButtonSymbols(QtWidgets.QAbstractSpinBox.PlusMinus)
+        spinbox.setFixedWidth(50)
+        spinbox.setValue(0)
+        spinbox.setMaximum(180)
+        spinbox.setSingleStep(15)
+        return spinbox
+
+    def _set_dsbx_properties(self):
+        spinbox = QtWidgets.QDoubleSpinBox()
+        spinbox.setButtonSymbols(QtWidgets.QAbstractSpinBox.PlusMinus)
+        spinbox.setFixedWidth(50)
+        spinbox.setValue(0)
+        spinbox.setMaximum(50)
+        spinbox.setSingleStep(.5)
+        return spinbox
+
+    def create_labels(self):
+        layout = QtWidgets.QGridLayout()
+        layout.setHorizontalSpacing(20)
         self.item_to_scatter_header_lbl = QtWidgets.QLabel("Item to Scatter")
         self.item_to_scatter_header_lbl.setStyleSheet("font: bold")
         self.scatter_to_lbl = QtWidgets.QLabel("Scatter To")
@@ -53,34 +102,9 @@ class ScatterToolUI(QtWidgets.QDialog):
         self.rotation_lbl.setStyleSheet("font: bold")
         self.resize_lbl = QtWidgets.QLabel("Scale")
         self.resize_lbl.setStyleSheet("font: bold")
-        layout = QtWidgets.QGridLayout()
-        #layout_rot = self._create_rotation_boxes()
-        #layout_scl = self._create_size_boxes()
-        second_select = self._create_select_second_ui()
-        first_select = self._create_select_first_ui()
         layout.addWidget(self.item_to_scatter_header_lbl, 0, 0)
         layout.addWidget(self.scatter_to_lbl, 4, 0)
-        layout.addWidget(second_select, 5, 0)
-        layout.addWidget(first_select, 1, 0)
-        layout.addWidget(self.resize_lbl, 7, 0)
-        layout.addWidget(self.rotation_lbl, 9, 0)
+        layout.addWidget(self.resize_lbl, 4, 5)
+        layout.addWidget(self.rotation_lbl, 0, 5)
         return layout
 
-    def _create_rotation_boxes(self):
-        self.x_sbx = QtWidgets.QSpinBox()
-        self.x_sbx.setButtonSymbols(QtWidgets.QAbstractSpinBox.PlusMinus)
-        self.x_sbx.setFixedWidth(50)
-        self.x_sbx.setValue(0)
-        self.x_sbx.setMaximum(180)
-        self.x_sbx.setSingleStep(15)
-        self.x_lbl = QtWidgets.QLabel("x")
-        return self.x_sbx
-
-
-    def _create_select_second_ui(self):
-        layout = QtWidgets.QLineEdit("Type in an existing polygon name")
-        return layout
-
-    def _create_select_first_ui(self):
-        layout = QtWidgets.QLineEdit("Type in an existing polygon name or type of polygon (ex. polySphere)")
-        return layout
