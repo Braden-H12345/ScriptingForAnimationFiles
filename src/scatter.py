@@ -25,6 +25,31 @@ class ScatterToolUI(QtWidgets.QDialog):
         self.setWindowFlags(self.windowFlags() ^
                             QtCore.Qt.WindowContextHelpButtonHint)
         self.create_ui()
+        self.create_connections()
+
+    def create_connections(self):
+        self.scatter_btn.clicked.connect(self.scatter_function)
+        self.fill_selected_one_btn.clicked.connect(self.fill_selected_one_function)
+        self.fill_selected_two_btn.clicked.connect(self.fill_selected_two_function)
+
+    @QtCore.Slot()
+    def scatter_function(self):
+        """Large amount of program will happen in here!"""
+
+    @QtCore.Slot()
+    def fill_selected_one_function(self):
+        selected = cmds.ls(sl=True, o=True)
+        self.first_select.setText(selected[0])
+
+    @QtCore.Slot()
+    def fill_selected_two_function(self):
+        selected = cmds.ls(sl=True)
+        selected_text = ""
+        i = 0
+        for obj in selected:
+            selected_text += selected[i] + ", "
+            i += 1
+        self.second_select.setText(selected_text)
 
     def create_ui(self):
         self.title_lbl = QtWidgets.QLabel("Scatter Tool")
@@ -143,4 +168,3 @@ class ScatterToolUI(QtWidgets.QDialog):
         layout.addWidget(self.rotation_max_lbl, 8, 7)
         layout.addWidget(self.resize_max_lbl, 11, 7)
         return layout
-
