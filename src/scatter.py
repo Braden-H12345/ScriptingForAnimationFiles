@@ -49,6 +49,15 @@ class ScatterToolUI(QtWidgets.QDialog):
         for vertex in selected_vtx:
             new_obj = cmds.instance(self.first_select.text())
             location = cmds.pointPosition(selected_vtx[value], w=True)
+            x_rot = random.uniform(self.rot_x_sbx_min.value(), self.rot_x_sbx_max.value())
+            y_rot = random.uniform(self.rot_y_sbx_min.value(), self.rot_y_sbx_max.value())
+            z_rot = random.uniform(self.rot_z_sbx_min.value(), self.rot_z_sbx_max.value())
+            x_scl = random.uniform(self.size_x_sbx_min.value(), self.size_x_sbx_max.value())
+            y_scl = random.uniform(self.size_y_sbx_min.value(), self.size_y_sbx_max.value())
+            z_scl = random.uniform(self.size_z_sbx_min.value(), self.size_z_sbx_max.value())
+            
+            cmds.rotate(x_rot, y_rot, z_rot, new_obj)
+            cmds.scale(x_scl, y_scl, z_scl, new_obj)
             cmds.move(location[0], location[1], location[2], new_obj[0], a=True, ws=True)
             value += 1
 
