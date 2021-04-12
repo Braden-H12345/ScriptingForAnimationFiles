@@ -39,10 +39,19 @@ class ScatterToolUI(QtWidgets.QDialog):
         cmds.select(clear=True)
         names = list(self.second_select.text().split(", "))
         names = names[:-1]
+
         i = 0
         for obj in names:
             cmds.select(names[i], add=True)
             i += 1
+
+        print(names[0])
+
+        if ".vtx" not in names[0]:
+            for x in range(500):
+                """Used 500 as it should be large enough for any polygon that is in the scene"""
+                cmds.select(names[0] + ".vtx[" + str(x) + "]", add=True)
+
         selected_vtx = cmds.filterExpand(expand=True, sm=31)
         value = 0
 
@@ -55,7 +64,7 @@ class ScatterToolUI(QtWidgets.QDialog):
             x_scl = random.uniform(self.size_x_sbx_min.value(), self.size_x_sbx_max.value())
             y_scl = random.uniform(self.size_y_sbx_min.value(), self.size_y_sbx_max.value())
             z_scl = random.uniform(self.size_z_sbx_min.value(), self.size_z_sbx_max.value())
-            
+
             cmds.rotate(x_rot, y_rot, z_rot, new_obj)
             cmds.scale(x_scl, y_scl, z_scl, new_obj)
             cmds.move(location[0], location[1], location[2], new_obj[0], a=True, ws=True)
@@ -158,7 +167,7 @@ class ScatterToolUI(QtWidgets.QDialog):
         spinbox.setButtonSymbols(QtWidgets.QAbstractSpinBox.PlusMinus)
         spinbox.setFixedWidth(50)
         spinbox.setValue(0)
-        spinbox.setMaximum(180)
+        spinbox.setMaximum(360)
         spinbox.setSingleStep(15)
         return spinbox
 
