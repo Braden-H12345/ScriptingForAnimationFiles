@@ -1,4 +1,5 @@
 import logging
+import random
 
 from PySide2 import QtWidgets, QtCore
 from shiboken2 import wrapInstance
@@ -35,6 +36,21 @@ class ScatterToolUI(QtWidgets.QDialog):
     @QtCore.Slot()
     def scatter_function(self):
         """Large amount of program will happen in here!"""
+        cmds.select(clear=True)
+        names = list(self.second_select.text().split(", "))
+        names = names[:-1]
+        i = 0
+        for obj in names:
+            cmds.select(names[i], add=True)
+            i += 1
+        selected_vtx = cmds.filterExpand(expand=True, sm=31)
+        value = 0
+
+        for vertex in selected_vtx:
+            new_obj = cmds.instance(self.first_select.text())
+            location = cmds.pointPosition(selected_vtx[value], w=True)
+            cmds.move(location[0], location[1], location[2], new_obj[0], a=True, ws=True)
+            value += 1
 
     @QtCore.Slot()
     def fill_selected_one_function(self):
@@ -43,7 +59,7 @@ class ScatterToolUI(QtWidgets.QDialog):
 
     @QtCore.Slot()
     def fill_selected_two_function(self):
-        selected = cmds.ls(sl=True)
+        selected = cmds.ls(sl=True, fl=True)
         selected_text = ""
         i = 0
         for obj in selected:
