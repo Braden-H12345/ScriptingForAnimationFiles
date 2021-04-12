@@ -17,6 +17,8 @@ def maya_main_window():
 
 class ScatterToolUI(QtWidgets.QDialog):
 
+    global_instance = []
+
     def __init__(self):
         super(ScatterToolUI, self).__init__(parent=maya_main_window())
         self.setWindowTitle("Scatter Tool")
@@ -35,7 +37,6 @@ class ScatterToolUI(QtWidgets.QDialog):
 
     @QtCore.Slot()
     def scatter_function(self):
-        """Large amount of program will happen in here!"""
         cmds.select(clear=True)
         names = list(self.second_select.text().split(", "))
         names = names[:-1]
@@ -44,8 +45,6 @@ class ScatterToolUI(QtWidgets.QDialog):
         for obj in names:
             cmds.select(names[i], add=True)
             i += 1
-
-        print(names[0])
 
         if ".vtx" not in names[0]:
             for x in range(500):
@@ -56,23 +55,16 @@ class ScatterToolUI(QtWidgets.QDialog):
         value = 0
 
         for vertex in selected_vtx:
-            new_obj = cmds.instance(self.first_select.text())
+            new_obj = cmds.instance(ScatterToolUI.global_instance)
             location = cmds.pointPosition(selected_vtx[value], w=True)
-            x_rot = random.uniform(self.rot_x_sbx_min.value(), self.rot_x_sbx_max.value())
-            y_rot = random.uniform(self.rot_y_sbx_min.value(), self.rot_y_sbx_max.value())
-            z_rot = random.uniform(self.rot_z_sbx_min.value(), self.rot_z_sbx_max.value())
-            x_scl = random.uniform(self.size_x_sbx_min.value(), self.size_x_sbx_max.value())
-            y_scl = random.uniform(self.size_y_sbx_min.value(), self.size_y_sbx_max.value())
-            z_scl = random.uniform(self.size_z_sbx_min.value(), self.size_z_sbx_max.value())
-
-            cmds.rotate(x_rot, y_rot, z_rot, new_obj)
-            cmds.scale(x_scl, y_scl, z_scl, new_obj)
+            self.set_transforms(new_obj)
             cmds.move(location[0], location[1], location[2], new_obj[0], a=True, ws=True)
             value += 1
 
     @QtCore.Slot()
     def fill_selected_one_function(self):
         selected = cmds.ls(sl=True, o=True)
+        ScatterToolUI.global_instance = selected[0]
         self.first_select.setText(selected[0])
 
     @QtCore.Slot()
@@ -85,7 +77,19 @@ class ScatterToolUI(QtWidgets.QDialog):
             i += 1
         self.second_select.setText(selected_text)
 
+    def set_transforms(self, new_obj):
+        """Sets the transform of the object"""
+        x_rot = random.uniform(self.rot_x_sbx_min.value(), self.rot_x_sbx_max.value())
+        y_rot = random.uniform(self.rot_y_sbx_min.value(), self.rot_y_sbx_max.value())
+        z_rot = random.uniform(self.rot_z_sbx_min.value(), self.rot_z_sbx_max.value())
+        x_scl = random.uniform(self.size_x_sbx_min.value(), self.size_x_sbx_max.value())
+        y_scl = random.uniform(self.size_y_sbx_min.value(), self.size_y_sbx_max.value())
+        z_scl = random.uniform(self.size_z_sbx_min.value(), self.size_z_sbx_max.value())
+        cmds.rotate(x_rot, y_rot, z_rot, new_obj)
+        cmds.scale(x_scl, y_scl, z_scl, new_obj)
+        
     def create_ui(self):
+        """Creates the UI layout"""
         self.title_lbl = QtWidgets.QLabel("Scatter Tool")
         self.title_lbl.setStyleSheet("font: bold 20px")
         self.button_lay = self._create_buttons_ui()
@@ -97,6 +101,7 @@ class ScatterToolUI(QtWidgets.QDialog):
         self.setLayout(self.main_lay)
 
     def _create_buttons_ui(self):
+        """Creates the buttons in the UI"""
         self.scatter_btn = QtWidgets.QPushButton("Scatter!")
         self.scatter_btn.setStyleSheet("font: bold")
         self.fill_selected_one_btn = QtWidgets.QPushButton("Fill Selected to 'Item to Scatter'")
@@ -108,10 +113,11 @@ class ScatterToolUI(QtWidgets.QDialog):
         return layout
 
     def _create_selection_layouts(self):
+        """Creates the rest of the layout. Line edits and spin boxes"""
         layout = self.create_labels()
         self.create_spinboxes()
-        self.second_select = QtWidgets.QLineEdit("Type in an existing polygon name")
-        self.first_select = QtWidgets.QLineEdit("Type in an existing polygon name or type of polygon (ex. polySphere)")
+        self.second_select = QtWidgets.QLineEdit("Type in an existing polygon name!")
+        self.first_select = QtWidgets.QLineEdit("Type in an existing polygon name!")
         self.first_select.setFixedWidth(450)
         layout.addWidget(self.second_select, 7, 0)
         layout.addWidget(self.first_select, 1, 0)
@@ -119,7 +125,7 @@ class ScatterToolUI(QtWidgets.QDialog):
         return layout
 
     def add_widgets(self, layout):
-        """Simply adds widgets. Using this to clean up one function"""
+        """Simply adds spinbox widgets. Using this to clean up one function"""
         layout.addWidget(self.rot_x_sbx_min, 1, 1)
         layout.addWidget(QtWidgets.QLabel("x"), 1, 2)
         layout.addWidget(self.rot_y_sbx_min, 1, 3)
@@ -149,6 +155,7 @@ class ScatterToolUI(QtWidgets.QDialog):
         layout.addWidget(QtWidgets.QLabel("z"), 11, 6)
 
     def create_spinboxes(self):
+        """Creates the spinboxes"""
         self.rot_x_sbx_min = self._set_sbx_properties()
         self.rot_y_sbx_min = self._set_sbx_properties()
         self.rot_z_sbx_min = self._set_sbx_properties()
@@ -163,6 +170,7 @@ class ScatterToolUI(QtWidgets.QDialog):
         self.size_z_sbx_max = self._set_dsbx_properties()
 
     def _set_sbx_properties(self):
+        """Sets properties of normal (integer) spinboxes"""
         spinbox = QtWidgets.QSpinBox()
         spinbox.setButtonSymbols(QtWidgets.QAbstractSpinBox.PlusMinus)
         spinbox.setFixedWidth(50)
@@ -172,6 +180,7 @@ class ScatterToolUI(QtWidgets.QDialog):
         return spinbox
 
     def _set_dsbx_properties(self):
+        """Sets properties of the double spinboxes"""
         spinbox = QtWidgets.QDoubleSpinBox()
         spinbox.setButtonSymbols(QtWidgets.QAbstractSpinBox.PlusMinus)
         spinbox.setFixedWidth(50)
@@ -181,6 +190,7 @@ class ScatterToolUI(QtWidgets.QDialog):
         return spinbox
 
     def create_labels(self):
+        """Creates the labels"""
         layout = QtWidgets.QGridLayout()
         layout.setHorizontalSpacing(5)
         self.item_to_scatter_header_lbl = QtWidgets.QLabel("Item to Scatter")
