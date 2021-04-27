@@ -16,7 +16,6 @@ def maya_main_window():
 
 
 class ScatterToolUI(QtWidgets.QDialog):
-
     global_instance = []
 
     def __init__(self):
@@ -37,9 +36,12 @@ class ScatterToolUI(QtWidgets.QDialog):
 
     @QtCore.Slot()
     def scatter_function(self):
+        percentage = self.percent_spinbox.value() * .01
         cmds.select(clear=True)
         names = list(self.second_select.text().split(", "))
         names = names[:-1]
+        random_nums = []
+        selected_vtx = []
 
         i = 0
         for obj in names:
@@ -53,10 +55,19 @@ class ScatterToolUI(QtWidgets.QDialog):
 
         selected_vtx = cmds.filterExpand(expand=True, sm=31)
         value = 0
+        nums_track = 0
+
+        total = len(selected_vtx)
+        vertex_make = percentage * total
+        vertex_make = int(vertex_make)
+
+        for x in range(0, vertex_make):
+            random_nums = random.sample(range(total), k=vertex_make)
+            nums_track += 1
 
         for vertex in selected_vtx:
             new_obj = cmds.instance(ScatterToolUI.global_instance)
-            location = cmds.pointPosition(selected_vtx[value], w=True)
+            location = cmds.pointPosition(selected_vtx[random_nums[value]], w=True)
             self.set_transforms(new_obj)
             cmds.move(location[0], location[1], location[2], new_obj[0], a=True, ws=True)
             value += 1
@@ -157,17 +168,17 @@ class ScatterToolUI(QtWidgets.QDialog):
 
     def create_percent(self, layout):
         """Creates percentage spinbox and assigns properties, uses double for more complex percentages"""
-        spinbox = QtWidgets.QDoubleSpinBox()
-        spinbox.setButtonSymbols(QtWidgets.QAbstractSpinBox.PlusMinus)
-        spinbox.setFixedWidth(60)
-        spinbox.setValue(100.0)
-        spinbox.setMaximum(100.0)
-        spinbox.setMinimum(0)
-        spinbox.setSingleStep(1.0)
+        self.percent_spinbox = QtWidgets.QDoubleSpinBox()
+        self.percent_spinbox.setButtonSymbols(QtWidgets.QAbstractSpinBox.PlusMinus)
+        self.percent_spinbox.setFixedWidth(60)
+        self.percent_spinbox.setValue(100.0)
+        self.percent_spinbox.setMaximum(100.0)
+        self.percent_spinbox.setMinimum(0)
+        self.percent_spinbox.setSingleStep(1.0)
         percentage_label = QtWidgets.QLabel("Percentage of Vertices")
         percentage_label.setStyleSheet("font: bold")
         layout.addWidget(percentage_label, 12, 7)
-        layout.addWidget(spinbox, 12, 5)
+        layout.addWidget(self.percent_spinbox, 12, 5)
         layout.addWidget(QtWidgets.QLabel("%"), 12, 6)
 
     def create_spinboxes(self):
@@ -178,7 +189,6 @@ class ScatterToolUI(QtWidgets.QDialog):
         self.rot_x_sbx_max = self._set_sbx_properties()
         self.rot_y_sbx_max = self._set_sbx_properties()
         self.rot_z_sbx_max = self._set_sbx_properties()
-
 
         self.size_x_sbx_min = self._set_dsbx_properties()
         self.size_y_sbx_min = self._set_dsbx_properties()
