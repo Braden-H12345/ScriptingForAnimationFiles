@@ -87,7 +87,7 @@ class ScatterToolUI(QtWidgets.QDialog):
         z_scl = random.uniform(self.size_z_sbx_min.value(), self.size_z_sbx_max.value())
         cmds.rotate(x_rot, y_rot, z_rot, new_obj)
         cmds.scale(x_scl, y_scl, z_scl, new_obj)
-        
+
     def create_ui(self):
         """Creates the UI layout"""
         self.title_lbl = QtWidgets.QLabel("Scatter Tool")
@@ -122,6 +122,7 @@ class ScatterToolUI(QtWidgets.QDialog):
         layout.addWidget(self.second_select, 7, 0)
         layout.addWidget(self.first_select, 1, 0)
         self.add_widgets(layout)
+        self.create_percent(layout)
         return layout
 
     def add_widgets(self, layout):
@@ -154,6 +155,21 @@ class ScatterToolUI(QtWidgets.QDialog):
         layout.addWidget(self.size_z_sbx_max, 11, 5)
         layout.addWidget(QtWidgets.QLabel("z"), 11, 6)
 
+    def create_percent(self, layout):
+        """Creates percentage spinbox and assigns properties, uses double for more complex percentages"""
+        spinbox = QtWidgets.QDoubleSpinBox()
+        spinbox.setButtonSymbols(QtWidgets.QAbstractSpinBox.PlusMinus)
+        spinbox.setFixedWidth(60)
+        spinbox.setValue(100.0)
+        spinbox.setMaximum(100.0)
+        spinbox.setMinimum(0)
+        spinbox.setSingleStep(1.0)
+        percentage_label = QtWidgets.QLabel("Percentage of Vertices")
+        percentage_label.setStyleSheet("font: bold")
+        layout.addWidget(percentage_label, 12, 7)
+        layout.addWidget(spinbox, 12, 5)
+        layout.addWidget(QtWidgets.QLabel("%"), 12, 6)
+
     def create_spinboxes(self):
         """Creates the spinboxes"""
         self.rot_x_sbx_min = self._set_sbx_properties()
@@ -162,6 +178,8 @@ class ScatterToolUI(QtWidgets.QDialog):
         self.rot_x_sbx_max = self._set_sbx_properties()
         self.rot_y_sbx_max = self._set_sbx_properties()
         self.rot_z_sbx_max = self._set_sbx_properties()
+
+
         self.size_x_sbx_min = self._set_dsbx_properties()
         self.size_y_sbx_min = self._set_dsbx_properties()
         self.size_z_sbx_min = self._set_dsbx_properties()
