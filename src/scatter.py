@@ -36,6 +36,28 @@ class ScatterToolUI(QtWidgets.QDialog):
 
     @QtCore.Slot()
     def scatter_function(self):
+        if self.normal_checkbox.isChecked() is False:
+            self.scatter_work()
+        else:
+            self.normal_work()
+
+    @QtCore.Slot()
+    def fill_selected_one_function(self):
+        selected = cmds.ls(sl=True, o=True)
+        ScatterToolUI.global_instance = selected[0]
+        self.first_select.setText(selected[0])
+
+    @QtCore.Slot()
+    def fill_selected_two_function(self):
+        selected = cmds.ls(sl=True, fl=True)
+        selected_text = ""
+        i = 0
+        for obj in selected:
+            selected_text += selected[i] + ", "
+            i += 1
+        self.second_select.setText(selected_text)
+
+    def scatter_work(self):
         percentage = self.percent_spinbox.value() * .01
         cmds.select(clear=True)
         names = list(self.second_select.text().split(", "))
@@ -71,22 +93,6 @@ class ScatterToolUI(QtWidgets.QDialog):
             self.set_transforms(new_obj)
             cmds.move(location[0], location[1], location[2], new_obj[0], a=True, ws=True)
             value += 1
-
-    @QtCore.Slot()
-    def fill_selected_one_function(self):
-        selected = cmds.ls(sl=True, o=True)
-        ScatterToolUI.global_instance = selected[0]
-        self.first_select.setText(selected[0])
-
-    @QtCore.Slot()
-    def fill_selected_two_function(self):
-        selected = cmds.ls(sl=True, fl=True)
-        selected_text = ""
-        i = 0
-        for obj in selected:
-            selected_text += selected[i] + ", "
-            i += 1
-        self.second_select.setText(selected_text)
 
     def set_transforms(self, new_obj):
         """Sets the transform of the object"""
@@ -134,7 +140,16 @@ class ScatterToolUI(QtWidgets.QDialog):
         layout.addWidget(self.first_select, 1, 0)
         self.add_widgets(layout)
         self.create_percent(layout)
+        self.create_checkbox(layout)
         return layout
+
+    def create_checkbox(self, layout):
+        """Creates the checkbox layout"""
+        self.normal_checkbox = QtWidgets.QCheckBox()
+        layout.addWidget(self.normal_checkbox, 10, 0)
+        check_label = QtWidgets.QLabel("Check to scatter to normals of faces instead!")
+        check_label.setStyleSheet("font: bold")
+        layout.addWidget(check_label, 9, 0)
 
     def add_widgets(self, layout):
         """Simply adds spinbox widgets. Using this to clean up one function"""
