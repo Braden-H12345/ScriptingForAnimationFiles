@@ -37,10 +37,16 @@ class ScatterToolUI(QtWidgets.QDialog):
 
     @QtCore.Slot()
     def scatter_function(self):
-        if self.normal_checkbox.isChecked() is False:
-            self.scatter_work()
+        if self.face_checkbox.isChecked() is False:
+            if self.normal_checkbox.isChecked() is False:
+                self.scatter_work()
+            else:
+                self.normal_work()
         else:
-            self.normal_work()
+            if self.normal_checkbox.isChecked() is False:
+                self.scatter_work_face()
+            else:
+                self.normal_work_face()
 
     @QtCore.Slot()
     def fill_selected_one_function(self):
@@ -57,6 +63,113 @@ class ScatterToolUI(QtWidgets.QDialog):
             selected_text += selected[i] + ", "
             i += 1
         self.second_select.setText(selected_text)
+
+    def normal_work_face(self):
+        percentage = self.percent_spinbox.value() * .01
+        cmds.select(clear=True)
+        names = list(self.second_select.text().split(", "))
+        names = names[:-1]
+        random_nums = []
+        selected_face = []
+
+        i = 0
+        for obj in names:
+            cmds.select(names[i], add=True)
+            i += 1
+
+        if ".f[" not in names[0]:
+            for x in range(500):
+                """Used 500 as it should be large enough for any polygon that is in the scene"""
+                cmds.select(names[0] + ".f[" + str(x) + "]", add=True)
+
+        selected_face = cmds.filterExpand(expand=True, sm=34)
+        value = 0
+        nums_track = 0
+
+        total = len(selected_face)
+        vertex_make = percentage * total
+        vertex_make = round(vertex_make)
+        vertex_make = int(vertex_make)
+
+        for x in range(0, vertex_make):
+            random_nums = random.sample(range(total), k=vertex_make)
+            nums_track += 1
+
+        for face in selected_face:
+            if len(random_nums) > value:
+                new_obj = cmds.instance(ScatterToolUI.global_instance)
+                location = [1.2, 1.2, 1.2]
+                location = self.find_center_face(selected_face[random_nums[value]])
+                self.set_transforms(new_obj)
+                cmds.move(location[0], location[1], location[2], new_obj[0], a=True, ws=True)
+                cmds.normalConstraint(selected_face[random_nums[value]], new_obj[0], aimVector=[0.0, 1.0, 0.0])
+            value += 1
+
+
+    def scatter_work_face(self):
+        percentage = self.percent_spinbox.value() * .01
+        cmds.select(clear=True)
+        names = list(self.second_select.text().split(", "))
+        names = names[:-1]
+        random_nums = []
+        selected_face = []
+
+        i = 0
+        for obj in names:
+            cmds.select(names[i], add=True)
+            i += 1
+
+        if ".f[" not in names[0]:
+            for x in range(500):
+                """Used 500 as it should be large enough for any polygon that is in the scene"""
+                cmds.select(names[0] + ".f[" + str(x) + "]", add=True)
+
+        selected_face = cmds.filterExpand(expand=True, sm=34)
+        value = 0
+        nums_track = 0
+
+        total = len(selected_face)
+        vertex_make = percentage * total
+        vertex_make = round(vertex_make)
+        vertex_make = int(vertex_make)
+
+        for x in range(0, vertex_make):
+            random_nums = random.sample(range(total), k=vertex_make)
+            nums_track += 1
+
+        for face in selected_face:
+            if len(random_nums) > value:
+                new_obj = cmds.instance(ScatterToolUI.global_instance)
+                location = [1.2, 1.2, 1.2]
+                location = self.find_center_face(selected_face[random_nums[value]])
+                self.set_transforms(new_obj)
+                cmds.move(location[0], location[1], location[2], new_obj[0], a=True, ws=True)
+            value += 1
+
+    def find_center_face(self, face_number):
+        location = [0.0, 1.2, 0.0]
+        vertex_pos = cmds.xform(face_number, q=True, ws=True, t=True)
+        vertex_num_int = int(len(vertex_pos) / 3)
+        sum_x = 0.0
+        sum_y = 0.0
+        sum_z = 0.0
+        i = 0
+        j = 1
+        k = 2
+        for x in range(0, vertex_num_int):
+            sum_x = sum_x + float(vertex_pos[i])
+            sum_y = sum_y + float(vertex_pos[j])
+            sum_z = sum_z + float(vertex_pos[k])
+            i += 3
+            j += 3
+            k += 3
+        avg_x = sum_x / vertex_num_int
+        avg_y = sum_y / vertex_num_int
+        avg_z = sum_z / vertex_num_int
+        location[0] = avg_x
+        location[1] = avg_y
+        location[2] = avg_z
+        return location
 
     def normal_work(self):
         percentage = self.percent_spinbox.value() * .01
@@ -170,6 +283,7 @@ class ScatterToolUI(QtWidgets.QDialog):
         layout.addWidget(self.fill_selected_one_btn)
         layout.addWidget(self.fill_selected_two_btn)
         layout.addWidget(self.scatter_btn)
+        layout_two = QtWidgets.QHBoxLayout()
         return layout
 
     def _create_selection_layouts(self):
@@ -188,11 +302,16 @@ class ScatterToolUI(QtWidgets.QDialog):
 
     def create_checkbox(self, layout):
         """Creates the checkbox layout"""
+        self.face_checkbox = QtWidgets.QCheckBox()
         self.normal_checkbox = QtWidgets.QCheckBox()
         layout.addWidget(self.normal_checkbox, 10, 0)
-        check_label = QtWidgets.QLabel("Check to align object with normal of surface!")
+        layout.addWidget(self.face_checkbox, 12, 0)
+        check_label = QtWidgets.QLabel("Check to align objects with normal of surface!")
         check_label.setStyleSheet("font: bold")
+        face_label = QtWidgets.QLabel("Check to scatter objects to faces instead!")
+        face_label.setStyleSheet("font: bold")
         layout.addWidget(check_label, 9, 0)
+        layout.addWidget(face_label, 11, 0)
 
     def add_widgets(self, layout):
         """Simply adds spinbox widgets. Using this to clean up one function"""
