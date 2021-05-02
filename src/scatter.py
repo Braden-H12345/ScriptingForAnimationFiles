@@ -63,7 +63,7 @@ class ScatterToolUI(QtWidgets.QDialog):
         names = list(self.second_select.text().split(", "))
         names = names[:-1]
         random_nums = []
-        selected_vtx = []
+        selected_face = []
 
         i = 0
         for obj in names:
@@ -79,12 +79,37 @@ class ScatterToolUI(QtWidgets.QDialog):
         value = 0
 
         for face in selected_face:
-            # new_obj = cmds.instance(ScatterToolUI.global_instance)
-            print(selected_face[value])
+            new_obj = cmds.instance(ScatterToolUI.global_instance)
+            location = [1.2, 1.2, 1.2]
             location = self.find_center_face(selected_face[value])
-            # self.set_transforms(new_obj)
-            # cmds.move(location[0], location[1], location[2], new_obj[0], a=True, ws=True)
+            self.set_transforms(new_obj)
+            cmds.move(location[0], location[1], location[2], new_obj[0], a=True, ws=True)
             value += 1
+
+    def find_center_face(self, face_number):
+        location = [0.0, 1.2, 0.0]
+        vertex_pos = cmds.xform(face_number, q=True, ws=True, t=True)
+        vertex_num_int = int(len(vertex_pos) / 3)
+        sum_x = 0.0
+        sum_y = 0.0
+        sum_z = 0.0
+        i = 0
+        j = 1
+        k = 2
+        for x in range(0, vertex_num_int):
+            sum_x = sum_x + float(vertex_pos[i])
+            sum_y = sum_y + float(vertex_pos[j])
+            sum_z = sum_z + float(vertex_pos[k])
+            i += 3
+            j += 3
+            k += 3
+        avg_x = sum_x / vertex_num_int
+        avg_y = sum_y / vertex_num_int
+        avg_z = sum_z / vertex_num_int
+        location[0] = avg_x
+        location[1] = avg_y
+        location[2] = avg_z
+        return location
 
     def scatter_work(self):
         percentage = self.percent_spinbox.value() * .01
@@ -109,19 +134,13 @@ class ScatterToolUI(QtWidgets.QDialog):
         nums_track = 0
 
         total = len(selected_vtx)
-        print(total)
         vertex_make = percentage * total
         vertex_make = round(vertex_make)
         vertex_make = int(vertex_make)
-        print(vertex_make)
-
-        print(selected_vtx)
 
         for x in range(0, vertex_make):
             random_nums = random.sample(range(total), k=vertex_make)
             nums_track += 1
-
-        print(random_nums)
 
         for vertex in selected_vtx:
             if len(random_nums) > value:
