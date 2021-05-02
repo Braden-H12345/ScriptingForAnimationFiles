@@ -124,10 +124,11 @@ class ScatterToolUI(QtWidgets.QDialog):
         print(random_nums)
 
         for vertex in selected_vtx:
-            location = cmds.pointPosition(selected_vtx[random_nums[value]], w=True)
-            new_obj = cmds.instance(ScatterToolUI.global_instance)
-            self.set_transforms(new_obj)
-            cmds.move(location[0], location[1], location[2], new_obj[0], a=True, ws=True)
+            if len(random_nums) > value:
+                location = cmds.pointPosition(selected_vtx[random_nums[value]], w=True)
+                new_obj = cmds.instance(ScatterToolUI.global_instance)
+                self.set_transforms(new_obj)
+                cmds.move(location[0], location[1], location[2], new_obj[0], a=True, ws=True)
             value += 1
 
     def set_transforms(self, new_obj):
