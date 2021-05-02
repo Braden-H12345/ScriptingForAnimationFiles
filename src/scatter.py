@@ -1,5 +1,6 @@
 import logging
 import random
+import math
 
 from PySide2 import QtWidgets, QtCore
 from shiboken2 import wrapInstance
@@ -57,6 +58,34 @@ class ScatterToolUI(QtWidgets.QDialog):
             i += 1
         self.second_select.setText(selected_text)
 
+    def normal_work(self):
+        cmds.select(clear=True)
+        names = list(self.second_select.text().split(", "))
+        names = names[:-1]
+        random_nums = []
+        selected_vtx = []
+
+        i = 0
+        for obj in names:
+            cmds.select(names[i], add=True)
+            i += 1
+
+        if ".f[" not in names[0]:
+            for x in range(500):
+                """Used 500 as it should be large enough for any polygon that is in the scene"""
+                cmds.select(names[0] + ".f[" + str(x) + "]", add=True)
+
+        selected_face = cmds.filterExpand(expand=True, sm=34)
+        value = 0
+
+        for face in selected_face:
+            # new_obj = cmds.instance(ScatterToolUI.global_instance)
+            print(selected_face[value])
+            location = self.find_center_face(selected_face[value])
+            # self.set_transforms(new_obj)
+            # cmds.move(location[0], location[1], location[2], new_obj[0], a=True, ws=True)
+            value += 1
+
     def scatter_work(self):
         percentage = self.percent_spinbox.value() * .01
         cmds.select(clear=True)
@@ -80,16 +109,23 @@ class ScatterToolUI(QtWidgets.QDialog):
         nums_track = 0
 
         total = len(selected_vtx)
+        print(total)
         vertex_make = percentage * total
+        vertex_make = round(vertex_make)
         vertex_make = int(vertex_make)
+        print(vertex_make)
+
+        print(selected_vtx)
 
         for x in range(0, vertex_make):
             random_nums = random.sample(range(total), k=vertex_make)
             nums_track += 1
 
+        print(random_nums)
+
         for vertex in selected_vtx:
-            new_obj = cmds.instance(ScatterToolUI.global_instance)
             location = cmds.pointPosition(selected_vtx[random_nums[value]], w=True)
+            new_obj = cmds.instance(ScatterToolUI.global_instance)
             self.set_transforms(new_obj)
             cmds.move(location[0], location[1], location[2], new_obj[0], a=True, ws=True)
             value += 1
@@ -183,13 +219,13 @@ class ScatterToolUI(QtWidgets.QDialog):
 
     def create_percent(self, layout):
         """Creates percentage spinbox and assigns properties, uses double for more complex percentages"""
-        self.percent_spinbox = QtWidgets.QDoubleSpinBox()
+        self.percent_spinbox = QtWidgets.QSpinBox()
         self.percent_spinbox.setButtonSymbols(QtWidgets.QAbstractSpinBox.PlusMinus)
         self.percent_spinbox.setFixedWidth(60)
-        self.percent_spinbox.setValue(100.0)
-        self.percent_spinbox.setMaximum(100.0)
+        self.percent_spinbox.setValue(100)
+        self.percent_spinbox.setMaximum(100)
         self.percent_spinbox.setMinimum(0)
-        self.percent_spinbox.setSingleStep(1.0)
+        self.percent_spinbox.setSingleStep(1)
         percentage_label = QtWidgets.QLabel("Percentage of Vertices")
         percentage_label.setStyleSheet("font: bold")
         layout.addWidget(percentage_label, 12, 7)
