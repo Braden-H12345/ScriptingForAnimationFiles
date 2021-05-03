@@ -105,7 +105,6 @@ class ScatterToolUI(QtWidgets.QDialog):
                 cmds.normalConstraint(selected_face[random_nums[value]], new_obj[0], aimVector=[0.0, 1.0, 0.0])
             value += 1
 
-
     def scatter_work_face(self):
         percentage = self.percent_spinbox.value() * .01
         cmds.select(clear=True)
